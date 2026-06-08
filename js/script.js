@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Elements
   const taskForm = document.getElementById('taskForm');
   const taskInput = document.getElementById('taskInput');
+  const taskSearch = document.getElementById('taskSearch');
   const taskListContainer = document.getElementById('taskListContainer');
   const totalTasksEl = document.getElementById('totalTasks');
   const completedTasksEl = document.getElementById('completedTasks');
@@ -20,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // State
   let tasks = [];
   let currentFilter = 'all';
+  let searchQuery = '';
+  let feedbackHideTimer = null;
 
   // --- Storage helpers ---
   function saveTasks() {
@@ -36,8 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!raw) return [];
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed)) return [];
-      // Basic validation
-      return parsed.filter(t => t && typeof t.id === 'string' && typeof t.title === 'string');
+      return parsed
+        .filter(task => task && typeof task.id === 'string' && typeof task.title === 'string')
+        .map(task => ({
+          id: task.id,
+          title: String(task.title).trim(),
+          completed: Boolean(task.completed),
+          createdAt: typeof task.createdAt === 'number' ? task.createdAt : Date.now(),
+        }));
     } catch (err) {
       console.warn('Failed to load tasks, resetting.', err);
       return [];
@@ -52,12 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function showFeedback(message = '', type = 'error') {
     if (!formFeedback) return;
     formFeedback.textContent = message;
-    formFeedback.classList.remove('visually-hidden');
-    formFeedback.classList.toggle('text-danger', type === 'error');
-    formFeedback.classList.toggle('text-success', type === 'success');
+    formFeedback.classList.remove('visually-hidden', 'text-danger', 'text-success');
+    formFeedback.classList.add(type === 'success' ? 'text-success' : 'text-danger');
     // hide after 3s
-    clearTimeout(formFeedback._hideTimer);
-    formFeedback._hideTimer = setTimeout(() => {
+    clearTimeout(feedbackHideTimer);
+    feedbackHideTimer = setTimeout(() => {
       formFeedback.classList.add('visually-hidden');
     }, 3000);
   }
@@ -90,10 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
     return true;
   }
 
+  function findTaskIndex(id) {
+    return tasks.findIndex(task => task.id === id);
+  }
+
   function deleteTask(id) {
-    const idx = tasks.findIndex(t => t.id === id);
-    if (idx === -1) return;
-    tasks.splice(idx, 1);
+    const index = findTaskIndex(id);
+    if (index === -1) return;
+    tasks.splice(index, 1);
     saveTasks();
     renderTasks();
   }
@@ -104,15 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
       showFeedback('Task title cannot be empty.', 'error');
       return false;
     }
-    const idx = tasks.findIndex(t => t.id === id);
-    if (idx === -1) return false;
-    // prevent duplicate (except this id)
-    const dup = tasks.some(t => t.id !== id && t.title.toLowerCase() === trimmed.toLowerCase());
-    if (dup) {
+    const index = findTaskIndex(id);
+    if (index === -1) return false;
+    const duplicate = tasks.some(task => task.id !== id && task.title.toLowerCase() === trimmed.toLowerCase());
+    if (duplicate) {
       showFeedback('Another task already uses this title.', 'error');
       return false;
     }
-    tasks[idx].title = trimmed;
+    tasks[index].title = trimmed;
     saveTasks();
     renderTasks();
     showFeedback('Task updated', 'success');
@@ -120,9 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function toggleTask(id) {
-    const idx = tasks.findIndex(t => t.id === id);
-    if (idx === -1) return;
-    tasks[idx].completed = !tasks[idx].completed;
+    const index = findTaskIndex(id);
+    if (index === -1) return;
+    tasks[index].completed = !tasks[index].completed;
     saveTasks();
     renderTasks();
   }
@@ -133,19 +144,28 @@ document.addEventListener('DOMContentLoaded', () => {
     taskListContainer.innerHTML = '';
 
     const filtered = tasks.filter(t => {
-      if (currentFilter === 'all') return true;
-      if (currentFilter === 'completed') return !!t.completed;
-      if (currentFilter === 'pending') return !t.completed;
-      return true;
+      const matchesFilter =
+        currentFilter === 'all' ||
+        (currentFilter === 'completed' && t.completed) ||
+        (currentFilter === 'pending' && !t.completed);
+      const matchesSearch = searchQuery
+        ? t.title.toLowerCase().includes(searchQuery.toLowerCase())
+        : true;
+      return matchesFilter && matchesSearch;
     });
 
     if (filtered.length === 0) {
-      // empty state
+      const message = tasks.length === 0
+        ? 'No tasks available yet.'
+        : searchQuery
+          ? 'No tasks match your search.'
+          : 'No tasks match the selected filter.';
+
       const empty = document.createElement('div');
       empty.className = 'text-center py-5';
       empty.innerHTML = `
-        <span class="d-block mb-2 text-muted">No tasks available</span>
-        <p class="mb-0 small text-secondary">Add your first task above to see the list populate.</p>
+        <span class="d-block mb-2 text-muted">${message}</span>
+        <p class="mb-0 small text-secondary">Try clearing the search or adding a new task.</p>
       `;
       taskListContainer.appendChild(empty);
       updateStats();
@@ -172,8 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const title = document.createElement('span');
       title.className = 'task-title';
       title.textContent = task.title;
-      title.tabIndex = 0;
-      title.setAttribute('role', 'text');
 
       left.appendChild(checkbox);
       left.appendChild(title);
@@ -296,15 +314,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // keyboard: Enter on input also triggers submit via form
+  if (taskSearch) {
+    taskSearch.addEventListener('input', (e) => {
+      searchQuery = String(e.target.value || '').trim();
+      renderTasks();
+    });
+  }
 
   // filter buttons
   filterButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const f = btn.getAttribute('data-filter');
       currentFilter = f || 'all';
-      filterButtons.forEach(b => b.classList.remove('active'));
+      filterButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       renderTasks();
     });
   });
