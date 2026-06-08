@@ -79,7 +79,7 @@
                         Prepare your daily workflow with a clean task entry area that is ready for
                         future interaction.
                       </p>
-                      <form class="row g-3">
+                      <form id="taskForm" class="row g-3" novalidate>
                         <div class="col-12">
                           <label for="taskInput" class="form-label visually-hidden">Task description</label>
                           <input
@@ -94,9 +94,12 @@
                           </div>
                         </div>
                         <div class="col-12 col-md-4 d-grid">
-                          <button id="addTaskButton" type="button" class="btn btn-primary btn-lg">
+                          <button id="addTaskButton" type="submit" class="btn btn-primary btn-lg">
                             Add Task
                           </button>
+                        </div>
+                        <div class="col-12">
+                          <div id="formFeedback" role="status" aria-live="polite" class="mt-2 visually-hidden"></div>
                         </div>
                       </form>
                     </div>
@@ -124,7 +127,7 @@
               <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
                 <div class="card-body">
                   <p class="text-uppercase text-muted mb-2 small">Total Tasks</p>
-                  <h3 class="display-6 mb-3">0</h3>
+                  <h3 id="totalTasks" class="display-6 mb-3">0</h3>
                   <p class="text-secondary mb-0">All tasks created in the workspace.</p>
                 </div>
               </article>
@@ -133,7 +136,7 @@
               <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
                 <div class="card-body">
                   <p class="text-uppercase text-muted mb-2 small">Completed Tasks</p>
-                  <h3 class="display-6 mb-3">0</h3>
+                  <h3 id="completedTasks" class="display-6 mb-3">0</h3>
                   <p class="text-secondary mb-0">Tasks marked as finished and reviewed.</p>
                 </div>
               </article>
@@ -142,7 +145,7 @@
               <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
                 <div class="card-body">
                   <p class="text-uppercase text-muted mb-2 small">Pending Tasks</p>
-                  <h3 class="display-6 mb-3">0</h3>
+                  <h3 id="pendingTasks" class="display-6 mb-3">0</h3>
                   <p class="text-secondary mb-0">Tasks waiting to be prioritized or started.</p>
                 </div>
               </article>
@@ -162,9 +165,9 @@
             </div>
             <div class="col-md-6 text-md-end">
               <div class="btn-group" role="group" aria-label="Task filters">
-                <button type="button" class="btn btn-outline-secondary active">All</button>
-                <button type="button" class="btn btn-outline-secondary">Completed</button>
-                <button type="button" class="btn btn-outline-secondary">Pending</button>
+                <button id="filterAll" type="button" class="btn btn-outline-secondary active" data-filter="all">All</button>
+                <button id="filterCompleted" type="button" class="btn btn-outline-secondary" data-filter="completed">Completed</button>
+                <button id="filterPending" type="button" class="btn btn-outline-secondary" data-filter="pending">Pending</button>
               </div>
             </div>
           </div>
@@ -185,7 +188,7 @@
                     <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary">Empty state</span>
                   </div>
 
-                  <div id="taskListContainer" class="task-list-placeholder rounded-4 p-5 text-center">
+                  <div id="taskListContainer" class="task-list-placeholder rounded-4 p-5 text-center" role="region" aria-live="polite">
                     <span class="d-block mb-2 text-muted">No tasks available</span>
                     <p class="mb-0 small text-secondary">
                       Add your first task above to see the list populate in a later phase.
@@ -207,11 +210,7 @@
       </div>
     </footer>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-qmM1gWWj7J1h0cDfI0BpmnSHiA+2a7hRt93a8+Y1A0D+zDH6E6zQvYI7ANFOVKfI"
-      crossorigin="anonymous"
-    ></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="js/script.js"></script>
   </body>
 </html>

@@ -102,6 +102,74 @@ body {
   font-weight: 600;
 }
 
+/* Task item styles */
+.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.85rem;
+  transition: background-color 0.15s ease, transform 0.06s ease;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.task-item:not(:last-child) {
+  margin-bottom: 0.75rem;
+}
+
+.task-item:hover {
+  background-color: rgba(79, 70, 229, 0.03);
+}
+
+.task-left {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex: 1 1 auto;
+}
+
+.task-checkbox {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.task-title {
+  font-size: 1rem;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.task-completed .task-title {
+  text-decoration: line-through;
+  color: rgba(17,24,39,0.45);
+  opacity: 0.85;
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.task-actions .btn {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  border-radius: 0.6rem;
+}
+
+.task-edit-input {
+  border-radius: 0.6rem;
+  padding: 0.35rem 0.5rem;
+}
+
+/* Focus states for accessibility */
+button:focus, .form-control:focus, .task-edit-input:focus {
+  outline: 3px solid rgba(79,70,229,0.12);
+  outline-offset: 2px;
+}
+
 @media (max-width: 575.98px) {
   .hero-section {
     padding-top: 3rem;
@@ -126,4 +194,9 @@ body {
     padding-top: 5rem;
     padding-bottom: 5rem;
   }
+}
+
+@media (max-width: 420px) {
+  .task-item { flex-direction: column; align-items: stretch; }
+  .task-actions { justify-content: flex-end; }
 }
