@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern To-Do Manager</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-ENjdO4Dr2bkBIFxQpeoD6V3QKZlA6OQF5p+6t7d6kz8U1p8MGOR5fZZS+7wp5yX"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm" aria-label="Primary navigation">
+      <div class="container">
+        <a class="navbar-brand fw-bold text-white" href="#">
+          Modern To-Do Manager
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navigationMenu"
+          aria-controls="navigationMenu"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navigationMenu">
+          <ul class="navbar-nav ms-auto gap-2">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#statistics">Statistics</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#tasks">Tasks</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero-section py-5">
+        <div class="container">
+          <div class="row justify-content-center text-center">
+            <div class="col-xl-8 col-lg-9">
+              <p class="eyebrow mb-3">Productivity system for modern teams</p>
+              <h1 class="display-5 fw-semibold mb-3">Organize Your Tasks Efficiently</h1>
+              <p class="lead text-secondary mb-4">
+                Manage, track and improve productivity with a clean task workspace designed
+                for focus and clarity.
+              </p>
+              <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="#task-input" class="btn btn-primary btn-lg">Start Planning</a>
+                <a href="#statistics" class="btn btn-outline-light btn-lg">View Insights</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="task-input" class="pb-5">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-10">
+              <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+                  <div class="row align-items-center gy-3">
+                    <div class="col-md-8">
+                      <h2 class="h4 mb-3">Create a new task</h2>
+                      <p class="text-muted mb-4">
+                        Prepare your daily workflow with a clean task entry area that is ready for
+                        future interaction.
+                      </p>
+                      <form class="row g-3">
+                        <div class="col-12">
+                          <label for="taskInput" class="form-label visually-hidden">Task description</label>
+                          <input
+                            id="taskInput"
+                            type="text"
+                            class="form-control form-control-lg shadow-sm"
+                            placeholder="Add a new task (e.g. Design project wireframe)"
+                            aria-describedby="taskInputHelp"
+                          />
+                          <div id="taskInputHelp" class="form-text">
+                            This input is ready for future task creation logic.
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-4 d-grid">
+                          <button id="addTaskButton" type="button" class="btn btn-primary btn-lg">
+                            Add Task
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="col-md-4 text-center text-md-end">
+                      <div class="info-card p-3 rounded-4 bg-primary bg-opacity-10 h-100">
+                        <p class="mb-2 text-uppercase text-primary small fw-semibold">Ready for phase 2</p>
+                        <p class="mb-0 text-secondary">
+                          The interface is built for future interactivity with task cards, filters,
+                          and analytics.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="statistics" class="pb-5">
+        <div class="container">
+          <div class="row g-4">
+            <div class="col-md-4">
+              <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                  <p class="text-uppercase text-muted mb-2 small">Total Tasks</p>
+                  <h3 class="display-6 mb-3">0</h3>
+                  <p class="text-secondary mb-0">All tasks created in the workspace.</p>
+                </div>
+              </article>
+            </div>
+            <div class="col-md-4">
+              <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                  <p class="text-uppercase text-muted mb-2 small">Completed Tasks</p>
+                  <h3 class="display-6 mb-3">0</h3>
+                  <p class="text-secondary mb-0">Tasks marked as finished and reviewed.</p>
+                </div>
+              </article>
+            </div>
+            <div class="col-md-4">
+              <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                  <p class="text-uppercase text-muted mb-2 small">Pending Tasks</p>
+                  <h3 class="display-6 mb-3">0</h3>
+                  <p class="text-secondary mb-0">Tasks waiting to be prioritized or started.</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pb-5">
+        <div class="container">
+          <div class="row align-items-center justify-content-between">
+            <div class="col-md-6 mb-3 mb-md-0">
+              <h2 class="h4 mb-2">Task filters</h2>
+              <p class="text-muted mb-0">
+                Use the filter controls below to switch between task views in the next phase.
+              </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+              <div class="btn-group" role="group" aria-label="Task filters">
+                <button type="button" class="btn btn-outline-secondary active">All</button>
+                <button type="button" class="btn btn-outline-secondary">Completed</button>
+                <button type="button" class="btn btn-outline-secondary">Pending</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tasks" class="pb-5">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-10 mx-auto">
+              <div class="section-card card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4 p-lg-5">
+                  <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-4">
+                    <div>
+                      <h2 class="h4 mb-1">Tasks</h2>
+                      <p class="text-muted mb-0">A dedicated area for dynamic task content and status updates.</p>
+                    </div>
+                    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary">Empty state</span>
+                  </div>
+
+                  <div id="taskListContainer" class="task-list-placeholder rounded-4 p-5 text-center">
+                    <span class="d-block mb-2 text-muted">No tasks available</span>
+                    <p class="mb-0 small text-secondary">
+                      Add your first task above to see the list populate in a later phase.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer bg-dark text-white py-4">
+      <div class="container text-center">
+        <p class="mb-0 small">
+          &copy; 2026 Modern To-Do Manager. Designed for a clean, accessible productivity experience.
+        </p>
+      </div>
+    </footer>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-qmM1gWWj7J1h0cDfI0BpmnSHiA+2a7hRt93a8+Y1A0D+zDH6E6zQvYI7ANFOVKfI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/script.js"></script>
+  </body>
+</html>
