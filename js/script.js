@@ -18,11 +18,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const formFeedback = document.getElementById('formFeedback');
   const filterButtons = document.querySelectorAll('[data-filter]');
 
+  // Delete modal elements
+  const deleteModalEl = document.getElementById('deleteTaskModal');
+  const confirmDeleteTaskButton = document.getElementById('confirmDeleteTaskButton');
+  const cancelDeleteTaskButton = document.getElementById('cancelDeleteTaskButton');
+
   // State
   let tasks = [];
   let currentFilter = 'all';
   let searchQuery = '';
   let feedbackHideTimer = null;
+
+  // persisted filter/search keys
+  const FILTER_STORAGE_KEY = 'mdt.ui.filter.v1';
+  const SEARCH_STORAGE_KEY = 'mdt.ui.search.v1';
+
+  let taskIdToDelete = null;
+  let lastFocusEl = null;
 
   // --- Storage helpers ---
   function saveTasks() {
@@ -155,18 +167,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (filtered.length === 0) {
-      const message = tasks.length === 0
-        ? 'No tasks available yet.'
-        : searchQuery
-          ? 'No tasks match your search.'
-          : 'No tasks match the selected filter.';
+      // Empty state variants
+      const hasAnyTasks = tasks.length > 0;
+      const isSearchEmpty = Boolean(searchQuery);
+
+      let title = '';
+      let description = '';
+      let icon = '✨';
+
+      if (!hasAnyTasks) {
+        title = 'No tasks yet';
+        description = 'Add your first task above to start building momentum.';
+        icon = '🗒️';
+      } else if (isSearchEmpty) {
+        title = 'No matching results';
+        description = 'Try a different search term or clear the search box.';
+        icon = '🔎';
+      } else if (currentFilter === 'completed') {
+        title = 'No completed tasks';
+        description = 'Once you check items off, they’ll show up here.';
+        icon = '✅';
+      } else if (currentFilter === 'pending') {
+        title = 'No pending tasks';
+        description = 'You’re all caught up—great work!';
+        icon = '🌿';
+      } else {
+        title = 'No tasks to display';
+        description = 'Try switching filters or adding a new task.';
+        icon = '📭';
+      }
 
       const empty = document.createElement('div');
-      empty.className = 'text-center py-5';
+      empty.className = 'task-empty-state text-center py-5 p-4';
+      empty.setAttribute('role', 'status');
       empty.innerHTML = `
-        <span class="d-block mb-2 text-muted">${message}</span>
-        <p class="mb-0 small text-secondary">Try clearing the search or adding a new task.</p>
+        <div class="task-empty-icon" aria-hidden="true">${icon}</div>
+        <div class="task-empty-title mb-2">${title}</div>
+        <p class="task-empty-desc mb-0">${description}</p>
       `;
+
       taskListContainer.appendChild(empty);
       updateStats();
       return;
@@ -176,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     filtered.forEach(task => {
       const item = document.createElement('div');
       item.className = 'task-item';
+      item.setAttribute('data-task-id', task.id);
       if (task.completed) item.classList.add('task-completed');
 
       // left: checkbox + title
@@ -213,8 +253,10 @@ document.addEventListener('DOMContentLoaded', () => {
       delBtn.title = 'Delete task';
       delBtn.innerHTML = 'Delete';
       delBtn.addEventListener('click', () => {
-        const ok = confirm('Delete this task?');
-        if (ok) deleteTask(task.id);
+        lastFocusEl = document.activeElement;
+        taskIdToDelete = task.id;
+        const instance = bootstrap.Modal.getOrCreateInstance(deleteModalEl);
+        instance.show();
       });
 
       actions.appendChild(editBtn);
@@ -297,9 +339,89 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pendingTasksEl) pendingTasksEl.textContent = String(pending);
   }
 
+  // --- Delete modal behavior + focus management ---
+  if (deleteModalEl && confirmDeleteTaskButton && cancelDeleteTaskButton) {
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(deleteModalEl, {
+      backdrop: true,
+      keyboard: true,
+    });
+
+    deleteModalEl.addEventListener('shown.bs.modal', () => {
+      // Bootstrap handles focus trap; we ensure initial focus is on the primary action.
+      confirmDeleteTaskButton.focus();
+    });
+
+    deleteModalEl.addEventListener('hidden.bs.modal', () => {
+      // Restore focus to the element that opened the modal
+      if (lastFocusEl && typeof lastFocusEl.focus === 'function') {
+        lastFocusEl.focus();
+      }
+      lastFocusEl = null;
+      taskIdToDelete = null;
+    });
+
+    confirmDeleteTaskButton.addEventListener('click', () => {
+      if (!taskIdToDelete) {
+        modalInstance.hide();
+        return;
+      }
+
+      // Fade-out the matching DOM node first
+      const taskNode = taskListContainer.querySelector(`[data-task-id="${CSS.escape(taskIdToDelete)}"]`);
+      if (taskNode) {
+        taskNode.classList.add('task-delete-exit');
+        const timeoutId = window.setTimeout(() => {
+          deleteTask(taskIdToDelete);
+        }, 210);
+
+        taskNode.addEventListener(
+          'transitionend',
+          () => {
+            window.clearTimeout(timeoutId);
+            deleteTask(taskIdToDelete);
+          },
+          { once: true }
+        );
+      } else {
+        deleteTask(taskIdToDelete);
+      }
+
+      modalInstance.hide();
+    });
+
+    // Cancel: bootstrap dismiss triggers hidden event => focus restoration.
+  }
+
   // --- Event bindings ---
   // load state
   tasks = loadTasks();
+
+  // Restore persisted filter/search
+  try {
+    const savedFilter = localStorage.getItem(FILTER_STORAGE_KEY);
+    const savedSearch = localStorage.getItem(SEARCH_STORAGE_KEY);
+
+    if (savedFilter && ['all', 'completed', 'pending'].includes(savedFilter)) {
+      currentFilter = savedFilter;
+    }
+    if (typeof savedSearch === 'string') {
+      searchQuery = savedSearch;
+    }
+
+    // sync UI
+    filterButtons.forEach(b => {
+      const f = b.getAttribute('data-filter');
+      const isActive = f === currentFilter;
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+
+    if (taskSearch) {
+      taskSearch.value = searchQuery;
+    }
+  } catch (err) {
+    // ignore
+  }
 
   // form submit (Add task)
   if (taskForm) {
@@ -317,6 +439,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (taskSearch) {
     taskSearch.addEventListener('input', (e) => {
       searchQuery = String(e.target.value || '').trim();
+      try {
+        localStorage.setItem(SEARCH_STORAGE_KEY, searchQuery);
+      } catch {}
       renderTasks();
     });
   }
@@ -326,6 +451,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       const f = btn.getAttribute('data-filter');
       currentFilter = f || 'all';
+      try {
+        localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
+      } catch {}
       filterButtons.forEach(b => {
         b.classList.remove('active');
         b.setAttribute('aria-pressed', 'false');

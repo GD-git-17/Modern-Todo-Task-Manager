@@ -184,10 +184,59 @@ body {
 }
 
 /* Focus states for accessibility */
-button:focus, .form-control:focus, .task-edit-input:focus {
-  outline: 3px solid rgba(79,70,229,0.12);
+button:focus-visible, .form-control:focus-visible, .task-edit-input:focus-visible {
+  outline: 3px solid rgba(79,70,229,0.22);
   outline-offset: 2px;
 }
+
+/* Subtle task animations */
+@media (prefers-reduced-motion: reduce) {
+  .task-item,
+  .task-delete-exit {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.task-item {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: task-fade-in 220ms ease-out forwards;
+}
+
+@keyframes task-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.task-completed {
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.task-completed .task-title {
+  transition: opacity 160ms ease;
+}
+
+.task-delete-exit {
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.task-actions .btn {
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+.task-actions .btn:hover {
+  transform: translateY(-1px);
+}
+
+.task-actions .btn:active {
+  transform: translateY(0);
+}
+
 
 @media (max-width: 575.98px) {
   .hero-section {
