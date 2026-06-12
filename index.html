@@ -14,6 +14,20 @@
         <a class="navbar-brand fw-bold text-white" href="#">
           Modern To-Do Manager
         </a>
+
+        <div class="d-flex align-items-center gap-2 ms-lg-3">
+          <button
+            id="themeToggle"
+            type="button"
+            class="btn btn-sm btn-outline-light"
+            aria-label="Toggle dark mode"
+            aria-pressed="false"
+            title="Toggle theme"
+          >
+            🌙
+          </button>
+        </div>
+
         <button
           class="navbar-toggler"
           type="button"
@@ -115,8 +129,8 @@
             <div class="col-lg-10">
               <div class="card shadow-sm border-0 overflow-hidden">
                 <div class="card-body p-4 p-md-5">
-                  <div class="row align-items-center gy-3">
-                    <div class="col-md-8">
+                  <div class="row align-items-center gy-3 justify-content-center" >
+                    <div class="col-md-10 ">
                       <h2 class="h4 mb-3">Create a new task</h2>
                       <p class="text-muted mb-4">
                         Prepare your daily workflow with a clean task entry area that is ready for
@@ -133,28 +147,52 @@
                             aria-describedby="taskInputHelp"
                           />
                           <div id="taskInputHelp" class="form-text">
-                            This input is ready for future task creation logic.
+                            Add what you need to get done.
                           </div>
                         </div>
-                        <div class="col-12 col-md-4 d-grid">
-                          <button id="addTaskButton" type="submit" class="btn btn-primary btn-lg">
+
+                        <div class="col-12 col-md-4">
+                          <label for="taskPriority" class="form-label visually-hidden">Priority</label>
+                          <select id="taskPriority" class="form-select shadow-sm" aria-label="Select priority">
+                            <option value="high">🔴 High</option>
+                            <option value="medium" selected>🟡 Medium</option>
+                            <option value="low">🟢 Low</option>
+                          </select>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                          <label for="taskCategory" class="form-label visually-hidden">Category</label>
+                          <select id="taskCategory" class="form-select shadow-sm" aria-label="Select category">
+                            <option value="study">Study</option>
+                            <option value="work" selected>Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="fitness">Fitness</option>
+                          </select>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                          <label for="taskDueDate" class="form-label visually-hidden">Due date</label>
+                          <input
+                            id="taskDueDate"
+                            type="date"
+                            class="form-control shadow-sm"
+                            aria-label="Select due date"
+                          />
+                        </div>
+
+                        <div class="col-12 col-md-4 d-grid " >
+                          <button id="addTaskButton" type="submit" class="btn btn-primary btn-lg justify-content-center">
                             Add Task
                           </button>
                         </div>
+
                         <div class="col-12">
                           <div id="formFeedback" role="status" aria-live="polite" class="mt-2 visually-hidden"></div>
                         </div>
                       </form>
+
                     </div>
-                    <div class="col-md-4 text-center text-md-end">
-                      <div class="info-card p-3 rounded-4 bg-primary bg-opacity-10 h-100">
-                        <p class="mb-2 text-uppercase text-primary small fw-semibold">Ready for phase 2</p>
-                        <p class="mb-0 text-secondary">
-                          The interface is built for future interactivity with task cards, filters,
-                          and analytics.
-                        </p>
-                      </div>
-                    </div>
+                    
                   </div>
                 </div>
               </div>
@@ -165,37 +203,72 @@
 
       <section id="statistics" class="pb-5">
         <div class="container">
-          <div class="row g-4">
-            <div class="col-md-4">
-              <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
-                <div class="card-body">
-                  <p class="text-uppercase text-muted mb-2 small">Total Tasks</p>
-                  <h3 id="totalTasks" class="display-6 mb-3">0</h3>
-                  <p class="text-secondary mb-0">All tasks created in the workspace.</p>
-                </div>
-              </article>
+          <div class="d-flex flex-column gap-3">
+            <div class="row g-4">
+              <div class="col-md-4">
+                <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
+                  <div class="card-body">
+                    <p class="text-uppercase text-muted mb-2 small">Total Tasks</p>
+                    <h3 id="totalTasks" class="display-6 mb-3">0</h3>
+                    <p class="text-secondary mb-0">All tasks created in the workspace.</p>
+                  </div>
+                </article>
+              </div>
+              <div class="col-md-4">
+                <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
+                  <div class="card-body">
+                    <p class="text-uppercase text-muted mb-2 small">Completed Tasks</p>
+                    <h3 id="completedTasks" class="display-6 mb-3">0</h3>
+                    <p class="text-secondary mb-0">Tasks marked as finished and reviewed.</p>
+                  </div>
+                </article>
+              </div>
+              <div class="col-md-4">
+                <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
+                  <div class="card-body">
+                    <p class="text-uppercase text-muted mb-2 small">Pending Tasks</p>
+                    <h3 id="pendingTasks" class="display-6 mb-3">0</h3>
+                    <p class="text-secondary mb-0">Tasks waiting to be prioritized or started.</p>
+                  </div>
+                </article>
+              </div>
             </div>
-            <div class="col-md-4">
-              <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
-                <div class="card-body">
-                  <p class="text-uppercase text-muted mb-2 small">Completed Tasks</p>
-                  <h3 id="completedTasks" class="display-6 mb-3">0</h3>
-                  <p class="text-secondary mb-0">Tasks marked as finished and reviewed.</p>
+
+            <article class="productivity-card section-card card border-0 shadow-sm rounded-4">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                  <div>
+                    <p class="text-uppercase text-muted mb-1 small">Productivity Progress</p>
+                    <h3 class="h4 mb-0">
+                      <span id="productivityPercent">0</span><span class="text-muted">%</span>
+                    </h3>
+                  </div>
+                  <div class="d-flex gap-2 align-items-center">
+                    <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary" id="productivityProgressLabel" aria-live="polite">0/0 complete</span>
+                  </div>
                 </div>
-              </article>
-            </div>
-            <div class="col-md-4">
-              <article class="stat-card card h-100 border-0 shadow-sm rounded-4">
-                <div class="card-body">
-                  <p class="text-uppercase text-muted mb-2 small">Pending Tasks</p>
-                  <h3 id="pendingTasks" class="display-6 mb-3">0</h3>
-                  <p class="text-secondary mb-0">Tasks waiting to be prioritized or started.</p>
+
+                <div class="mt-4">
+                  <div
+                    id="productivityProgressBar"
+                    class="progress productivity-progress"
+                    role="progressbar"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                    aria-label="Overall productivity progress"
+                    tabindex="0"
+                  >
+                    <div class="progress-bar" style="width: 0%" aria-hidden="true"></div>
+                  </div>
+                  <p class="text-secondary mt-2 mb-0 small" id="productivityHint">Complete tasks to see your progress update.</p>
                 </div>
-              </article>
-            </div>
+              </div>
+            </article>
           </div>
         </div>
       </section>
+
 
       <section class="pb-5">
         <div class="container">
@@ -241,7 +314,7 @@
                     <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary">Empty state</span>
                   </div>
 
-                  <div id="taskListContainer" class="task-list-container rounded-4 p-5" role="region" aria-live="polite">
+                  <div id="taskListContainer" class="task-list-container rounded-4 p-4 p-lg-5" role="region" aria-live="polite">
                     <div class="task-list-placeholder text-center">
                       <span class="d-block mb-2 text-muted">No tasks available</span>
                       <p class="mb-0 small text-secondary">
